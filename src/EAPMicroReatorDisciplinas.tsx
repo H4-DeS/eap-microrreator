@@ -172,9 +172,9 @@ const getByPath = (root: NodeDef, path: NodeKey[]): { node: NodeDef; parent?: No
 };
 
 //Define a árvore inicial a ser gerada ao clicar no botão
-const initialTree = (): NodeDef => {
+/**const initialTree = (): NodeDef => {
   return {
-    key: "root",
+    key: "M",
     label: "PROJETO: Microrreator Nuclear",
     bg: COLORS.rootBg,
     fg: COLORS.rootFg,
@@ -182,7 +182,24 @@ const initialTree = (): NodeDef => {
       // ... seu conteúdo
     ],
   };
-};
+};**/
+
+function loadFromStorage(): NodeDef | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function loadDefaultTree(): Promise<NodeDef> {
+  // public/default.eap.json
+  const res = await fetch("/default.eap.json", { cache: "no-store" });
+  if (!res.ok) throw new Error(`default.eap.json HTTP ${res.status}`);
+  return res.json();
+}
 
 // Normaliza #hex (aceita 3 ou 6 dígitos). Retorna undefined se vazio/ inválido.
 function normalizeHexColor(v?: string): string | undefined {
@@ -196,6 +213,7 @@ function normalizeHexColor(v?: string): string | undefined {
 
 
 /** Monta as 6 disciplinas padrão **/
+/*
 const disciplinas = (prefix: string, children: NodeDef[]): NodeDef[] => [
   { key: `${prefix}.A`, label: `${prefix}.A Aquisição`, children: children.filter(c => c.key.startsWith(`${prefix}.A.`)) },
   { key: `${prefix}.P`, label: `${prefix}.P Projeto`, children: children.filter(c => c.key.startsWith(`${prefix}.P.`)) },
@@ -203,7 +221,7 @@ const disciplinas = (prefix: string, children: NodeDef[]): NodeDef[] => [
   { key: `${prefix}.L`, label: `${prefix}.L Licenciamento`, children: children.filter(c => c.key.startsWith(`${prefix}.L.`)) },
   { key: `${prefix}.M`, label: `${prefix}.M Montagem`, children: children.filter(c => c.key.startsWith(`${prefix}.M.`)) },
   { key: `${prefix}.K`, label: `${prefix}.K Comissionamento`, children: children.filter(c => c.key.startsWith(`${prefix}.K.`)) },
-];
+];  */
 
 /** Utilitários de cor */
 function hexToRgb(hex?: string): { r: number; g: number; b: number } | null {
@@ -505,7 +523,7 @@ function applyOpsToTree(root: NodeDef, ops: AIOp[]): NodeDef {
   const doAddDoc = (key: string, doc: string) => { walkTree(t, (n) => { if (n.key === key) { n.docs = n.docs ?? []; n.docs.push(doc); } }); };
   const doGenerate = (description?: string) => {
     const title = description ? ('PROJETO: ' + description) : 'PROJETO: Microrreator Nuclear';
-    t = initialTree();
+    //t = initialTree();
     t.label = title;
   };
 
@@ -696,7 +714,7 @@ export default function EAPMicroReatorDisciplinas() {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<NodeKey | undefined>();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const [tree, setTree] = useState<NodeDef>(() => loadFromStorage() ?? initialTree());
+  const [tree, setTree] = useState<NodeDef>(() => loadFromStorage() ?? blankTree());
   const [aiOpen, setAiOpen] = useState<boolean>(false);
   const [aiMessages, setAiMessages] = useState<ChatMsg[]>([]);
   const [aiMode, setAiMode] = useState<'offline' | 'online'>('offline');
@@ -807,6 +825,41 @@ export default function EAPMicroReatorDisciplinas() {
     }    
   };
 
+   // se já tem uma árvore salva, não sobrescreve
+  useEffect(() => {
+    
+    const stored = loadFromStorage();
+    if (stored) {
+      // veio do storage → colapsa uma vez
+      requestAnimationFrame(() => collapseAll());
+      return;
+    }
+  
+    let alive = true;
+  
+    (async () => {
+      try {
+        const def = await loadDefaultTree();
+        if (!alive) return;
+        setTree(def);
+        requestAnimationFrame(() => collapseAll());
+        setSelectedKey(undefined);
+      } catch (e) {
+        // fallback: mantém blankTree()
+        console.warn("Falha ao carregar default.eap.json:", e);
+      }
+    })();
+  
+    return () => { alive = false; };
+  }, []);
+  
+  /**persistência no localStorage */
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tree));
+    } catch {}
+  }, [tree]);
+
 
   /** Persistência automática */
   useEffect(() => {
@@ -848,8 +901,8 @@ export default function EAPMicroReatorDisciplinas() {
   return () => window.removeEventListener("keydown", onKey);
 }, [selectedKey, tree]);
 
-  function loadFromStorage(): NodeDef | null { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; return JSON.parse(raw); } catch { return null; } }
-
+// function loadFromStorage(): NodeDef | null { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; return JSON.parse(raw); } catch { return null; } }
+/** 
   function initialTree(): NodeDef {
     const t: NodeDef = {
       key: "root",
@@ -857,10 +910,10 @@ export default function EAPMicroReatorDisciplinas() {
       bg: COLORS.rootBg, fg: COLORS.rootFg,
       children: [
         { key: "1", label: "1 Unidade Crítica (UCRI) — (UDT-1)", bg: COLORS.ucBg, children: disciplinas("1", [
-          { key: "1.A.1", label: "1.A.1 Aquisições da UCri (equipamentos, instrumentos, serviços)", docs: [] },
-          { key: "1.P.1", label: "1.P.1 Projetos: neutrônico, mecânico, vareta combustível, I&C", docs: [] },
+          { key: "1.Azul.1", label: "1.A.1 Aquisições da UCri (equipamentos, instrumentos, serviços)", docs: [] },
+          { key: "1.Preto.1", label: "1.P.1 Projetos: neutrônico, mecânico, vareta combustível, I&C", docs: [] },
           { key: "1.P.2", label: "1.P.2 Planejamento e especificação das rotinas experimentais da UCri", docs: [] },
-          { key: "1.C.1", label: "1.C.1 Adequações físicas mínimas / infraestrutura de apoio à UCri (se aplicável)", docs: [] },
+          { key: "1.C2.1", label: "1.C.1 Adequações físicas mínimas / infraestrutura de apoio à UCri (se aplicável)", docs: [] },
           { key: "1.L.1", label: "1.L.1 Submissão e aprovação das rotinas experimentais junto à Autoridade Nuclear (AN)", docs: [] },
           { key: "1.M.1", label: "1.M.1 Montagem/instalação de instrumentos e arranjos de ensaio da UCri", docs: [] },
           { key: "1.K.1", label: "1.K.1 Execução das rotinas experimentais e registros de comissionamento da UCri", docs: [] },
@@ -883,64 +936,14 @@ export default function EAPMicroReatorDisciplinas() {
           { key: "3.M.1", label: "3.M.1 Montagem e integração dos sistemas das bancadas (UDT-3)", docs: [] },
           { key: "3.K.1", label: "3.K.1 Comissionamento e execução dos experimentos de efeito integrado (UDT-3)", docs: [] },
         ])},
-        { key: "4", label: "4 Sistema de Proteção e Controle e Supervisão Remota — (UDT-4)", bg: COLORS.spcBg, children: disciplinas("4", [
-          { key: "4.A.1", label: "4.A.1 Aquisições para o sistema de proteção/controle e supervisão remota", docs: [] },
-          { key: "4.P.1", label: "4.P.1 Projeto do sistema de proteção e controle da UCri", docs: [] },
-          { key: "4.P.2", label: "4.P.2 Concepção do sistema de supervisão remota para atuação com fontes renováveis em micro-redes", docs: [] },
-          { key: "4.C.1", label: "4.C.1 Desenvolvimento/integração de hardware e software de proteção/controle", docs: [] },
-          { key: "4.L.1", label: "4.L.1 Evidências/relatórios para licenciamento dos sistemas de proteção/controle (se aplicável)", docs: [] },
-          { key: "4.M.1", label: "4.M.1 Montagem/instalação e integração do sistema à mesa de controle do Argonauta", docs: [] },
-          { key: "4.K.1", label: "4.K.1 Testes e comissionamento do sistema de proteção/controle e supervisão remota", docs: [] },
-        ])},
-        { key: "5", label: "5 Microrreator e Análises Estruturais — (DRBC)", bg: COLORS.mrBg, children: disciplinas("5", [
-          { key: "5.A.1", label: "5.A.1 Aquisições para blindagem/contensão e ensaios", docs: [] },
-          { key: "5.P.1", label: "5.P.1 Projeto de blindagem (gama/nêutrons) do microrreator", docs: [] },
-          { key: "5.P.2", label: "5.P.2 Projeto mecânico & instrumentação da contenção com funções de blindagem/contensão", docs: [] },
-          { key: "5.P.3", label: "5.P.3 Análise termo-estrutural do microrreator em cenários operacionais", docs: [] },
-          { key: "5.C.1", label: "5.C.1 Protótipos/maquetes e preparações para ensaios estruturais", docs: [] },
-          { key: "5.L.1", label: "5.L.1 Evidências técnicas de segurança para licenciamento (blindagem/contensão)", docs: [] },
-          { key: "5.M.1", label: "5.M.1 Montagem de arranjos e instrumentação para validações", docs: [] },
-          { key: "5.K.1", label: "5.K.1 Testes de aceitação/validação termo-estrutural", docs: [] },
-        ])},
-        { key: "6", label: "6 Desenvolvimento dos Processos de Materiais — (DMAT)", bg: COLORS.matBg, children: disciplinas("6", [
-          { key: "6.A.1", label: "6.A.1 Aquisição de equipamentos/serviços/consumíveis para desenvolvimento de heat pipes", docs: [] },
-          { key: "6.P.1", label: "6.P.1 Desenvolvimento de materiais: BeO, grafita e B4C nuclearmente puro", docs: [] },
-          { key: "6.P.2", label: "6.P.2 Desenvolvimento para obtenção de heat pipes aplicáveis a microrreatores", docs: [] },
-          { key: "6.P.3", label: "6.P.3 Desenvolvimento para obtenção de pastilhas de UO₂ até 20 mm", docs: [] },
-          { key: "6.C.1", label: "6.C.1 Montagem de linhas piloto e dispositivos de processo para DMAT", docs: [] },
-          { key: "6.L.1", label: "6.L.1 Autorizações e controles regulatórios para materiais nucleares (quando aplicável)", docs: [] },
-          { key: "6.M.1", label: "6.M.1 Montagem/integração de equipamentos de processo (DMAT)", docs: [] },
-          { key: "6.K.1", label: "6.K.1 Comissionamento/qualificação de processo de materiais (DMAT)", docs: [] },
-        ])},
-        { key: "7", label: "7 Inserção e Sustentabilidade Socioambiental — (SUST)", bg: COLORS.susBg, children: disciplinas("7", [
-          { key: "7.A.1", label: "7.A.1 Aquisições para estudos/dados de inserção e sustentabilidade", docs: [] },
-          { key: "7.P.1", label: "7.P.1 Inserção na rede elétrica e em cidades < 20 mil hab.; planejamento de RDEE", docs: [] },
-          { key: "7.P.2", label: "7.P.2 Inserção em indústrias/serviços intensivos em eletricidade e estações de recarga", docs: [] },
-          { key: "7.P.3", label: "7.P.3 Interação com fontes renováveis e qualidade de energia", docs: [] },
-          { key: "7.P.4", label: "7.P.4 Avaliação de sustentabilidade socioambiental/econômica; locais; cenários regulatórios/políticas públicas", docs: [] },
-          { key: "7.P.5", label: "7.P.5 Contribuição dos microrreatores para redução de rejeitos de longa duração", docs: [] },
-          { key: "7.C.1", label: "7.C.1 Infraestruturas mínimas para pilotos/demonstrações (se aplicável)", docs: [] },
-          { key: "7.L.1", label: "7.L.1 Estudos/relatórios para interfaces regulatórias e socioambientais", docs: [] },
-          { key: "7.M.1", label: "7.M.1 Preparação logística/instalação de pilotos (se aplicável)", docs: [] },
-          { key: "7.K.1", label: "7.K.1 Comissionamento/validação de pilotos (se aplicável)", docs: [] },
-        ])},
-        { key: "8", label: "8 Sistema de Garantia da Qualidade (SGG)", bg: COLORS.qmsBg, children: disciplinas("8", [
-          { key: "8.A.1", label: "8.A.1 Aquisição/contratação de ferramentas/serviços de gestão documental (GED)", docs: [] },
-          { key: "8.P.1", label: "8.P.1 Implementação do Sistema de Qualidade (PGQ, planos e procedimentos)", docs: [] },
-          { key: "8.P.2", label: "8.P.2 Estruturação do arquivo técnico (proponente, coexecutoras, ICTs, contratadas)", docs: [] },
-          { key: "8.C.1", label: "8.C.1 Implantação de rotinas de controle, registros e indicadores", docs: [] },
-          { key: "8.L.1", label: "8.L.1 Relatórios CNEN, auditorias e verificações de conformidade", docs: [] },
-          { key: "8.M.1", label: "8.M.1 Montagem/organização inicial do repositório e taxonomia documental", docs: [] },
-          { key: "8.K.1", label: "8.K.1 Encerramento documental e lições aprendidas", docs: [] },
-        ])},
       ],
     };
     return t;
   }
-
+  */
   function blankTree(): NodeDef {
     return {
-      key: "root",
+      key: "M",
       label: "PROJETO: (sem título)",
       bg: COLORS.rootBg,
       fg: COLORS.rootFg,
@@ -1028,7 +1031,19 @@ export default function EAPMicroReatorDisciplinas() {
   const saveJson = () => { const blob = new Blob([JSON.stringify(tree, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `EAP_Microrreator_disciplinas_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); };
   const triggerLoadJson = () => { fileInputRef.current?.click(); };
   const onLoadJsonFile = (ev: React.ChangeEvent<HTMLInputElement>) => { const file = ev.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const obj = JSON.parse(String(reader.result)); setTree(obj); setCollapsed({}); } catch { alert("JSON inválido"); } }; reader.readAsText(file); ev.target.value = ""; };
-  const resetStorage = () => { try { localStorage.removeItem(STORAGE_KEY); setTree(initialTree()); setCollapsed({}); setSelectedKey(undefined); } catch {} };
+  //const resetStorage = () => { try { localStorage.removeItem(STORAGE_KEY); setTree(initialTree()); setCollapsed({}); setSelectedKey(undefined); } catch {} };
+  const resetStorage = async () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    setCollapsed({});
+    setSelectedKey(undefined);
+  
+    try {
+      const def = await loadDefaultTree();
+      setTree(def);
+    } catch {
+      setTree(blankTree());
+    }
+  };
   const newEap = () => {
   const ok = confirm("Criar uma nova EAP vazia? Isso não apaga arquivos salvos no seu disco, apenas substitui a EAP atual na tela.");
   if (!ok) return;
