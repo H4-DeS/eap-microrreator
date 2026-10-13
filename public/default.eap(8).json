@@ -1,0 +1,722 @@
+{
+  "key": "1",
+  "label": "1 PT-8 — SISTEMA DE GARANTIA DA QUALIDADE\n\n22%    377/1187      31/12/2028",
+  "docs": [],
+  "children": [
+    {
+      "key": "1.1",
+      "label": "1.1 PT-8 DDNM\n\n22%    377/1187      31/12/2028",
+      "docs": [],
+      "children": [
+        {
+          "key": "1.1.1",
+          "label": "1.1.1 Sistema da Qualidade\n\n22%    377/1187      31/12/2028",
+          "docs": [],
+          "children": [
+            {
+              "key": "1.1.1.1",
+              "label": "1.1.1.1 Planejamento, EAP e Ferramentas de Apoio ao SGQ\n\n87%    377/425   -0,02   15/12/2026",
+              "docs": [],
+              "children": [
+                {
+                  "key": "1.1.1.1.1",
+                  "label": "1.1.1.1.1 Estruturação inicial do SGQ do Projeto MRN\n\n60%    299/327   -0,31   25/11/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.1.2",
+                  "label": "1.1.1.1.2 Estruturação da EAP documental\n\n100%    75/75      30/01/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.1.3",
+                  "label": "1.1.1.1.3 Estruturação da EAP de entregáveis\n\n100%    57/57      14/03/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.1.4",
+                  "label": "1.1.1.1.4 Desenvolvimento e disponibilização da ferramenta EAP_Microrreator\n\n100%    71/71      25/02/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.1.5",
+                  "label": "1.1.1.1.5 Integração da EAP com Google Workspace / ferramentas de monitoramento\n\n100%    29/29      14/04/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.1.6",
+                  "label": "1.1.1.1.6 Atualização da matriz documental e do organograma geral do projeto\n\n100%    44/44      30/05/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.1.7",
+                  "label": "1.1.1.1.7 Apoio ao Relatório de Local / documentação de licenciamento\n\n50%    393/441   -0,39   15/12/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                }
+              ],
+              "bg": "#9ca3af"
+            },
+            {
+              "key": "1.1.1.2",
+              "label": "1.1.1.2 Produção da Documentação do SGQ\n\n34%    377/957   -0,05   30/05/2028",
+              "docs": [],
+              "children": [
+                {
+                  "key": "1.1.1.2.1",
+                  "label": "1.1.1.2.1 Programa de Garantia da Qualidade (PGQ) do IEN (Interrompida - Ajuste de escopo)\n\n100%    299/327   0,09   30/11/2026",
+                  "docs": [],
+                  "children": [
+                    {
+                      "key": "1.1.1.2.1.1",
+                      "label": "1.1.1.2.1.1 Elaboração do Item 1 conforme ANSN 1.16\n\n100%    44/44      28/02/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.1.2",
+                      "label": "1.1.1.2.1.2 Elaboração do Item 2 conforme ANSN 1.16\n\n100%    44/44      28/02/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.1.3",
+                      "label": "1.1.1.2.1.3 Elaboração do Item 3 conforme ANSN 1.16\n\n100%    44/44      28/02/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.1.4",
+                      "label": "1.1.1.2.1.4 Elaboração do Item 4 conforme ANSN 1.16\n\n100%    44/44      28/02/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.1.5",
+                      "label": "1.1.1.2.1.5 Revisão do PGQ\n\n100%    248/248      10/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.1.6",
+                      "label": "1.1.1.2.1.6 Aprovação do PGQ\n\n100%    1/29   0,97   30/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    }
+                  ],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.2.2",
+                  "label": "1.1.1.2.2 Programa de Garantia da Qualidade (PGQ) da TERMINUS\n\n34%    123/123   -0,66   05/09/2026",
+                  "docs": [],
+                  "children": [
+                    {
+                      "key": "1.1.1.2.2.1",
+                      "label": "1.1.1.2.2.1 Elaboração do Item 1 conforme ANSN 1.16\n\n100%    4/4      10/05/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.2.2",
+                      "label": "1.1.1.2.2.2 Elaboração do Item 2 conforme ANSN 1.16\n\n100%    12/12      12/07/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.2.3",
+                      "label": "1.1.1.2.2.3 Elaboração do Item 3 conforme ANSN 1.16\n\n100%    12/12      13/07/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.2.4",
+                      "label": "1.1.1.2.2.4 Elaboração do Item 4 conforme ANSN 1.16\n\n100%    34/34      14/07/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.2.5",
+                      "label": "1.1.1.2.2.5 Verificação do conteúdo (incluindo anexos) - INTERNA\n\n1%    6/13   -0,45   25/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.2.6",
+                      "label": "1.1.1.2.2.6 Verificação formal - INTERNA\n\n15%    1/8   0,03   25/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    }
+                  ],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.2.3",
+                  "label": "1.1.1.2.3 Procedimentos de Gestão do Sistema da Qualidade (PSQ) - TERMINUS\n\n47%    333/333   -0,53   10/10/2026",
+                  "docs": [],
+                  "children": [
+                    {
+                      "key": "1.1.1.2.3.1",
+                      "label": "1.1.1.2.3.1 Elaboração de Procedimentos\n\n100%    4/4      30/03/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.2",
+                      "label": "1.1.1.2.3.2 Codificação de Documentação Técnica\n\n100%    129/129      30/03/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.3",
+                      "label": "1.1.1.2.3.3 Controle de Documentos\n\n100%    28/28      30/03/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.4",
+                      "label": "1.1.1.2.3.4 Avaliação, Seleção, Qualificação e Monitoramento de Fornecedores\n\n90%    29/29   -0,1   30/08/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.5",
+                      "label": "1.1.1.2.3.5 Auditoria do Programa de Garantia da Qualidade\n\n0%    60/60   -1   30/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.6",
+                      "label": "1.1.1.2.3.6 Controle de Não Conformidades\n\n50%    81/81   -0,5   30/07/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.7",
+                      "label": "1.1.1.2.3.7 Seleção e Treinamento de Pessoal\n\n100%    16/16      30/04/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.8",
+                      "label": "1.1.1.2.3.8 Controle de Aquisições\n\n30%    29/29   -0,7   30/09/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.9",
+                      "label": "1.1.1.2.3.9 Avaliação pela Gerência e Monitoramento do PGQ\n\n0%    29/29   -1   30/08/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.3.10",
+                      "label": "1.1.1.2.3.10 Ações Corretivas\n\n0%    29/29   -1   30/09/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    }
+                  ],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.2.4",
+                  "label": "1.1.1.2.4 Procedimentos de Controle da Qualidade (PCQ) - TERMINUS\n\n2%    42/151   -0,26   14/02/2027",
+                  "docs": [],
+                  "children": [
+                    {
+                      "key": "1.1.1.2.4.1",
+                      "label": "1.1.1.2.4.1 Controle de Inspeções e Testes\n\n30%    29/29      15/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.2",
+                      "label": "1.1.1.2.4.2 Inspeção de Recebimento de Materiais e Equipamentos\n\n0%    29/29      15/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.3",
+                      "label": "1.1.1.2.4.3 Controle de Materiais e Equipamentos\n\n0%    29/29      15/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.4",
+                      "label": "1.1.1.2.4.4 Controle de Dispositivos de Inspeção, Medição, Ensaios e Monitoramento\n\n0%    12/29      14/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.5",
+                      "label": "1.1.1.2.4.5 Qualificação de Processos Especiais\n\n0%    12/29      14/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.6",
+                      "label": "1.1.1.2.4.6 Qualificação e Certificação de Inspetores\n\n0%    12/29      14/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.7",
+                      "label": "1.1.1.2.4.7 Qualificação de Procedimentos de Soldagem e Soldadores\n\n0%    -19/29      15/12/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.8",
+                      "label": "1.1.1.2.4.8 Ensaios Não Destrutivos\n\n0%    -19/29      15/12/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.9",
+                      "label": "1.1.1.2.4.9 Controle de Consumíveis de Soldagem\n\n0%    -19/29      15/12/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.10",
+                      "label": "1.1.1.2.4.10 Inspeção na Fabricação de Materiais e Equipamentos\n\n0%    -49/45      30/01/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.11",
+                      "label": "1.1.1.2.4.11 Inspeção de Equipamentos\n\n0%    -49/45      30/01/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.4.12",
+                      "label": "1.1.1.2.4.12 Inspeção em Testes e Comissionamento\n\n0%    -49/45      30/01/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    }
+                  ],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.2.5",
+                  "label": "1.1.1.2.5 Procedimentos Executivos Específicos (PEE) - TERMINUS\n\n0%    134/424   -0,32   14/08/2027",
+                  "docs": [],
+                  "children": [
+                    {
+                      "key": "1.1.1.2.5.1",
+                      "label": "1.1.1.2.5.1 Fabricação e Montagem\n\n0%    90/90   -1   15/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.5.2",
+                      "label": "1.1.1.2.5.2 Instalações Elétricas\n\n0%    60/60   -1   15/10/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.5.3",
+                      "label": "1.1.1.2.5.3 Instrumentação e Controle\n\n0%    42/60   -0,7   15/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.5.4",
+                      "label": "1.1.1.2.5.4 Serviços de Soldagem\n\n0%    60/60   -1   15/08/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.5.5",
+                      "label": "1.1.1.2.5.5 Serviços UDT-1\n\n0%    12/60   -0,2   15/12/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.5.6",
+                      "label": "1.1.1.2.5.6 Serviços UDT-4\n\n0%    -19/60      15/01/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.5.7",
+                      "label": "1.1.1.2.5.7 Testes e Comissionamento\n\n0%    -80/57      14/03/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    }
+                  ],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.2.6",
+                  "label": "1.1.1.2.6 Procedimentos Específicos de Engenharia (PEP) - TERMINUS\n\n4%    42/210   -0,16   14/04/2027",
+                  "docs": [],
+                  "children": [
+                    {
+                      "key": "1.1.1.2.6.1",
+                      "label": "1.1.1.2.6.1 Coordenação da Engenharia de Projeto\n\n0%    42/60   -0,7   15/11/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.6.2",
+                      "label": "1.1.1.2.6.2 Controle e Processos para Emissão dos Documentos de Engenharia de Projeto\n\n0%    12/60   -0,2   15/12/2026",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.6.3",
+                      "label": "1.1.1.2.6.3 Gerenciamento das Interfaces de Projeto\n\n0%    -19/60      15/01/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.6.4",
+                      "label": "1.1.1.2.6.4 Conceitos para Verificação de Projetos\n\n0%    -80/57      14/03/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    },
+                    {
+                      "key": "1.1.1.2.6.5",
+                      "label": "1.1.1.2.6.5 Controle e Processos Para Alterações dos Documentos de Engenharia de Projetos\n\n0%    -111/57      14/04/2027",
+                      "docs": [],
+                      "children": [],
+                      "bg": "#e5e7eb"
+                    }
+                  ],
+                  "bg": "#d1d5db"
+                }
+              ],
+              "bg": "#9ca3af"
+            },
+            {
+              "key": "1.1.1.3",
+              "label": "1.1.1.3 Implantação e Operação Assistida do SGQ\n\n0%    104/640   -0,16   01/05/2028",
+              "docs": [],
+              "children": [
+                {
+                  "key": "1.1.1.3.1",
+                  "label": "1.1.1.3.1 Planejamento da implantação do SGQ\n\n0%    45/45   -1   30/08/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.3.2",
+                  "label": "1.1.1.3.2 Acompanhamento da implementação dos PSQ\n\n0%    73/136   -0,54   30/12/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.3.3",
+                  "label": "1.1.1.3.3 Acompanhamento da implementação dos PCQ\n\n0%    12/257   -0,05   30/06/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.3.4",
+                  "label": "1.1.1.3.4 Acompanhamento da implementação dos PEE/PEP\n\n0%    -80/334      30/12/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.3.5",
+                  "label": "1.1.1.3.5 Revisão e adequação do SGQ conforme lições aprendidas\n\n0%    -261/167      30/12/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.3.6",
+                  "label": "1.1.1.3.6 Consolidação final do SGQ para suporte ao licenciamento\n\n0%    -445/91      01/05/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                }
+              ],
+              "bg": "#9ca3af"
+            },
+            {
+              "key": "1.1.1.4",
+              "label": "1.1.1.4 Treinamentos e Capacitação do SGQ\n\n23%    104/669   0,07   15/05/2028",
+              "docs": [],
+              "children": [
+                {
+                  "key": "1.1.1.4.1",
+                  "label": "1.1.1.4.1 Plano de Treinamento do SGQ\n\n80%    29/29   -0,2   15/08/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.4.2",
+                  "label": "1.1.1.4.2 Treinamento SGQ Nível I\n\n90%    60/60   -0,1   15/10/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.4.3",
+                  "label": "1.1.1.4.3 Treinamento SGQ Nível II\n\n0%    42/59   -0,71   15/11/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.4.4",
+                  "label": "1.1.1.4.4 Treinamento SGQ Nível III\n\n0%    -19/90      15/02/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.4.5",
+                  "label": "1.1.1.4.5 Implantação de ferramentas para avaliação e acompanhamento dos treinamentos\n\n0%    -170/90      15/07/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.4.6",
+                  "label": "1.1.1.4.6 Reciclagem e integração de novos participantes\n\n10%    -384/59      15/01/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.4.7",
+                  "label": "1.1.1.4.7 Treinamento final sobre arquivo técnico e evidências para licenciamento\n\n0%    -505/60      15/05/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                }
+              ],
+              "bg": "#9ca3af"
+            },
+            {
+              "key": "1.1.1.5",
+              "label": "1.1.1.5 Monitoramento, Avaliações, Auditorias e Ações Corretivas\n\n0%    12/592   -0,02   30/05/2028",
+              "docs": [],
+              "children": [
+                {
+                  "key": "1.1.1.5.1",
+                  "label": "1.1.1.5.1 Definição dos indicadores de acompanhamento do SGQ\n\n0%    -30/60      15/10/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.2",
+                  "label": "1.1.1.5.2 1ª Avaliação pela Gerência / Monitoramento do PGQ\n\n0%    -49/29      14/01/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.3",
+                  "label": "1.1.1.5.3 Planejamento da auditoria interna piloto do SGQ\n\n0%    12/60      15/12/2026",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.4",
+                  "label": "1.1.1.5.4 Execução da auditoria interna piloto\n\n0%    -19/60      15/01/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.5",
+                  "label": "1.1.1.5.5 Relatório da auditoria interna piloto\n\n0%    -49/30      15/01/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.6",
+                  "label": "1.1.1.5.6 Tratamento de não conformidades e ações corretivas\n\n0%    -80/89      15/04/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.7",
+                  "label": "1.1.1.5.7 Auditoria interna de acompanhamento\n\n0%    -231/29      15/07/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.8",
+                  "label": "1.1.1.5.8 Tratamento das ações decorrentes da auditoria de acompanhamento\n\n0%    -292/60      15/10/2027",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.9",
+                  "label": "1.1.1.5.9 Auditoria interna de maturidade do SGQ\n\n0%    -384/60      15/01/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.10",
+                  "label": "1.1.1.5.10 Avaliação final do SGQ e consolidação de resultados\n\n0%    -536/44      30/05/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.5.11",
+                  "label": "1.1.1.5.11 Diagnóstico final pré-licenciamento / pré-avaliação externa\n\n0%    -505/75      30/05/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                }
+              ],
+              "bg": "#9ca3af"
+            },
+            {
+              "key": "1.1.1.6",
+              "label": "1.1.1.6 Controle Documental, Arquivo Técnico e Emissão Controlada\n\n8%    299/910   -0,25   30/06/2028",
+              "docs": [],
+              "children": [
+                {
+                  "key": "1.1.1.6.1",
+                  "label": "1.1.1.6.1 Estruturação do repositório de documentos do SGQ\n\n10%    44/44   -0,9   30/06/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.2",
+                  "label": "1.1.1.6.2 Implantação da lista mestra de documentos e controle de revisões\n\n30%    91/91   -0,7   01/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.3",
+                  "label": "1.1.1.6.3 Definição do fluxo de emissão, distribuição e arquivamento controlado\n\n25%    44/44   -0,75   02/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.4",
+                  "label": "1.1.1.6.4 Operação assistida do controle documental do SGQ\n\n0%    12/623   -0,02   03/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.5",
+                  "label": "1.1.1.6.5 Controle de registros da qualidade, treinamentos e auditorias\n\n15%    -80/531      04/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.6",
+                  "label": "1.1.1.6.6 Organização do arquivo técnico para suporte ao licenciamento\n\n0%    -80/515      05/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.7",
+                  "label": "1.1.1.6.7 Emissão controlada de documentação para análise/licenciamento\n\n0%    -139/456      06/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.8",
+                  "label": "1.1.1.6.8 Consolidação final do índice documental e matriz de rastreabilidade\n\n0%    -505/90      07/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                },
+                {
+                  "key": "1.1.1.6.9",
+                  "label": "1.1.1.6.9 Relatório final de situação documental do SGQ\n\n0%    -566/45      08/07/2028",
+                  "docs": [],
+                  "children": [],
+                  "bg": "#d1d5db"
+                }
+              ],
+              "bg": "#9ca3af"
+            }
+          ],
+          "bg": "#6b7280"
+        }
+      ],
+      "bg": "#4b5563"
+    }
+  ],
+  "bg": "#2e2e2e"
+}
