@@ -525,19 +525,58 @@ function applyOpsToTree(root: NodeDef, ops: AIOp[]): NodeDef {
 }
 
 function makeHeuristicTips(root: NodeDef): string[] {
-  const tips: string[] = [];
-  (root.children ?? []).forEach(sec => {
-    const levelKeys = new Set((sec.children ?? []).map(c => c.key.split('.').slice(0,2).join('.')));
-    const expected = ['A','P','C','L','M','K'].map(ch => sec.key + '.' + ch);
-    const missing = expected.filter(k => !levelKeys.has(k));
-    if (missing.length) tips.push('Bloco ' + sec.key + ' parece sem as disciplinas: ' + missing.map(k=>k.split('.').pop()).join(', '));
-  });
-  walkTree(root, (n) => {
-    if (!n.children?.length && (n.docs?.length ?? 0) === 0 && n.key !== 'root') {
-      tips.push('Considere anexar "Documentos associados" ao item ' + n.key + ' – "' + n.label + '"');
+  const alerts: string[] = [];
+  const suggestions: string[] = [];
+  const seenKeys = new Set<string>();
+
+  walkTree(root, (node, parent) => {
+    const key = node.key?.trim() ?? "";
+    const label = node.label?.trim() ?? "";
+
+    // Verificação de identificadores
+    if (!key) {
+      alerts.push("Elemento sem identificador encontrado.");
+    } else if (seenKeys.has(key)) {
+      alerts.push(`Identificador duplicado: ${key}.`);
+    } else {
+      seenKeys.add(key);
+    }
+
+    // Verificação de descrições
+    if (!label) {
+      alerts.push(`Elemento ${key || "(sem código)"} sem descrição.`);
+    }
+
+    // Avaliação da complexidade da decomposição
+    const childCount = node.children?.length ?? 0;
+
+    if (childCount > 12) {
+      suggestions.push(
+        `O elemento ${key} possui ${childCount} subordinados. ` +
+        "Avalie se uma decomposição intermediária facilitaria a gestão."
+      );
+    }
+
+    // Sugestão de documentação para pacotes terminais
+    if (
+      parent &&
+      childCount === 0 &&
+      (node.docs?.length ?? 0) === 0
+    ) {
+      suggestions.push(
+        `Avalie a necessidade de documentos associados ao elemento ${key}.`
+      );
     }
   });
-  return tips.slice(0, 8);
+
+  // Verificação da estrutura geral
+  if (!root.children?.length) {
+    suggestions.unshift(
+      "A EAP ainda não possui elementos subordinados ao projeto."
+    );
+  }
+
+  return [...alerts, ...suggestions].slice(0, 8);
 }
 
 // === Helper para IA online (server) ===
@@ -1584,7 +1623,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
     style={btn}
     onClick={() => {
       const tips = makeHeuristicTips(tree).join('\n');
-      const msg = tips || 'Sem sugestões no momento. A estrutura parece consistente com as disciplinas.';
+      const msg = tips || 'Nenhum alerta ou sugestão identificado nas verificações automáticas.';
       setAiMessages(aiMessages.concat([{ role: 'assistant', content: msg }]));
       setAiOpen(true);
     }}
