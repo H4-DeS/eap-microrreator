@@ -1345,8 +1345,8 @@ export default function WBSStudio() {
   /** Persistência automática */
   useEffect(() => {
   const onKey = (e: KeyboardEvent) => {
-    // Bloqueia os atalhos do editor durante a recuperação de dados.
-    if (recoveryRequiredRef.current) return;
+    // Bloqueia os atalhos durante recuperação ou inicialização.
+    if (recoveryRequiredRef.current || !storageReady) return;
 
     // Evita atalhos globais enquanto digita em campos de texto ou no painel de edição
     const ae = (document.activeElement as HTMLElement) || (e.target as HTMLElement | null);
@@ -1383,7 +1383,7 @@ export default function WBSStudio() {
   };
   window.addEventListener("keydown", onKey);
   return () => window.removeEventListener("keydown", onKey);
-}, [selectedKey, tree]);
+}, [selectedKey, tree, storageReady]);
 
 // function loadFromStorage(): NodeDef | null { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; return JSON.parse(raw); } catch { return null; } }
   function blankTree(): NodeDef {
@@ -2230,6 +2230,38 @@ const exportSnapshotPng = async (): Promise<string | null> => {
             }}
           >
             WBS Studio — Proteção do armazenamento local
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Aguarda a conclusão da inicialização antes de liberar o editor.
+  if (!storageReady) {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 24,
+          boxSizing: "border-box",
+          background: "#0F172A",
+          color: "#F8FAFC"
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{ fontSize: 26, marginBottom: 12 }}>
+            WBS Studio
+          </h1>
+          <p style={{ fontSize: 16, color: "#CBD5E1" }}>
+            Carregando EAP inicial...
           </p>
         </div>
       </div>
