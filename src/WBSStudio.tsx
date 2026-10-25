@@ -19,7 +19,7 @@ import {
 } from "docx";
 
 /**
- * EAP – Microrreator Nuclear – VERSÃO POR DISCIPLINAS (Sidebar overlay + atalhos + reset)
+ * WBS Studio – Plataforma de Gerenciamento de EAP (Sidebar overlay + atalhos + reset)
  * --------------------------------------------------------------------------------------
  * ✓ Sidebar overlay (oculta conteúdo por cima, não "espreme" a área)
  * ✓ Remoção do título superior para eliminar área branca
@@ -466,7 +466,7 @@ function summarizeOps(ops: AIOp[]) {
 // adicionar filho em 4.L: Relatório de segurança
 // remover 1.C.1
 // documento 1.P.1 https://minha.url/doc.pdf
-// gerar eap Microrreator de pesquisa 50kW
+// gerar eap de um centro de tecnologia
 function parseToOps(input: string): AIOp[] {
   const ops: AIOp[] = [];
   const lines = input.split(/\n|;+/).map(s => s.trim()).filter(Boolean);
@@ -522,7 +522,7 @@ function applyOpsToTree(root: NodeDef, ops: AIOp[]): NodeDef {
   };
   const doAddDoc = (key: string, doc: string) => { walkTree(t, (n) => { if (n.key === key) { n.docs = n.docs ?? []; n.docs.push(doc); } }); };
   const doGenerate = (description?: string) => {
-    const title = description ? ('PROJETO: ' + description) : 'PROJETO: Microrreator Nuclear';
+    const title = description ? ('PROJETO: ' + description) : 'PROJETO: Novo Projeto';
     //t = initialTree();
     t.label = title;
   };
@@ -650,7 +650,7 @@ function AssistantPanel({
             <br />
             • <code>documento 1.P.1 https://minha.url/doc.pdf</code>
             <br />
-            • <code>gerar eap Microrreator de pesquisa 50kW</code>
+            • <code>gerar eap de um centro de tecnologia</code>
             <br />
             • <code>/online reorganize a EAP para foco em licenciamento</code>
           </div>
@@ -704,7 +704,7 @@ function AssistantPanel({
 
 /*** COMPONENTE PRINCIPAL ***/
 
-export default function EAPMicroReatorDisciplinas() {
+export default function WBSStudio() {
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [layout, setLayout] = useState<"horizontal" | "vertical" | "leftRight" | "topDown">("leftRight");
@@ -1028,7 +1028,7 @@ export default function EAPMicroReatorDisciplinas() {
   
 
   /** Salvar / Carregar JSON **/
-  const saveJson = () => { const blob = new Blob([JSON.stringify(tree, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `EAP_Microrreator_disciplinas_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); };
+  const saveJson = () => { const blob = new Blob([JSON.stringify(tree, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `WBS_Studio_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); };
   const triggerLoadJson = () => { fileInputRef.current?.click(); };
   const onLoadJsonFile = (ev: React.ChangeEvent<HTMLInputElement>) => { const file = ev.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const obj = JSON.parse(String(reader.result)); setTree(obj); setCollapsed({}); } catch { alert("JSON inválido"); } }; reader.readAsText(file); ev.target.value = ""; };
   //const resetStorage = () => { try { localStorage.removeItem(STORAGE_KEY); setTree(initialTree()); setCollapsed({}); setSelectedKey(undefined); } catch {} };
@@ -1110,7 +1110,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
   
     const link = document.createElement("a");
     link.href = dataUrl;
-    link.download = "EAP_Microrreator_disciplinas.png";
+    link.download = "WBS_Studio.png";
     link.click();
   };
   
@@ -1146,7 +1146,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
     const y = (pageHeight - renderH) / 2;
   
     pdf.addImage(dataUrl, "PNG", x, y, renderW, renderH);
-    pdf.save("EAP_Microrreator_disciplinas.pdf");
+    pdf.save("WBS_Studio.pdf");
   };
   
   const exportSlidesPptx = async () => {
@@ -1310,7 +1310,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
       const cover = await renderCurrentPng();
       if (cover) {
         const slide = pptx.addSlide();
-        addTitle(slide, "EAP – Microrreator Nuclear (Disciplinas)");
+        addTitle(slide, "WBS Studio - Estrutura Analítica do Projeto");
         addBreadcrumb(slide, "Visão geral da estrutura completa");
         await addContainedImage(slide, cover);
       }
@@ -1353,7 +1353,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
     }
   
     await pptx.writeFile({
-      fileName: `EAP_Microrreator_disciplinas_slides_${slidesMode}.pptx`,
+      fileName: `WBS_Studio_slides_${slidesMode}.pptx`,
     });
   };
   
@@ -1367,7 +1367,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
       new Paragraph({
         children: [
           new TextRun({
-            text: "EAP – Microrreator Nuclear (Disciplinas)",
+            text: "WBS Studio - Estrutura Analítica do Projeto",
             bold: true,
             size: 48,
           }),
@@ -1483,7 +1483,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `EAP_Microrreator_disciplinas_${new Date()
+    a.download = `WBS_Studio_${new Date()
       .toISOString()
       .slice(0, 10)}.docx`;
     a.click();
@@ -1539,7 +1539,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `EAP_Microrreator_disciplinas_${new Date()
+      a.download = `WBS_Studio_${new Date()
         .toISOString()
         .slice(0, 10)}.csv`;
       a.click();

@@ -1,11 +1,9 @@
-//import EAPMicroReator from "./EAPMicroReator";
-import EAPMicroReatorDisciplinas from "./EAPMicroReatorDisciplinas";
+import WBSStudio from "./WBSStudio";
 
 export default function App() {
   return (
     <div style={{ minHeight: "100vh", background: "#fff" }}>
-      <EAPMicroReatorDisciplinas />
+      <WBSStudio />
     </div>
   );
 }
-
