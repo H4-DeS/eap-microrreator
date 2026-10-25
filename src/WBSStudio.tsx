@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
+import { loadFromStorage, type StorageLoadResult } from "./storage/eapStorage";
 import { Tree, TreeNode } from "react-organizational-chart";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { toPng } from "html-to-image";
@@ -30,11 +31,6 @@ import {
 
 const STORAGE_KEY = "wbs_studio_v1";
 const RECOVERY_KEY = "wbs_studio_recovery_v1";
-
-type StorageLoadResult = {
-  tree: NodeDef | null;
-  recoveryRequired: boolean;
-};
 
 const COLORS = {
   appBg: "#0B0F19", // fundo escuro da área útil
@@ -305,43 +301,6 @@ const getByPath = (root: NodeDef, path: NodeKey[]): { node: NodeDef; parent?: No
   return { node: cur, parent, index: idx };
 };
 
-function loadFromStorage(): StorageLoadResult {
-  let raw: string | null;
-
-  try {
-    raw = localStorage.getItem(STORAGE_KEY);
-  } catch (error) {
-    console.warn("Não foi possível acessar o armazenamento local:", error);
-    return { tree: null, recoveryRequired: true };
-  }
-
-  if (raw === null) {
-    return { tree: null, recoveryRequired: false };
-  }
-
-  try {
-    const data: unknown = JSON.parse(raw);
-    const validation = validateTree(data);
-
-    if (validation.valid) {
-      return { tree: data as NodeDef, recoveryRequired: false };
-    }
-
-    console.error("EAP armazenada inválida:", validation.errors);
-  } catch (error) {
-    console.error("JSON armazenado inválido:", error);
-  }
-
-  try {
-    if (localStorage.getItem(RECOVERY_KEY) === null) {
-      localStorage.setItem(RECOVERY_KEY, raw);
-    }
-  } catch (error) {
-    console.warn("Falha ao criar cópia de recuperação:", error);
-  }
-
-  return { tree: null, recoveryRequired: true };
-}
 async function loadDefaultTree(): Promise<NodeDef> {
   // public/default.eap.json
   const res = await fetch("/default.eap.json", { cache: "no-store" });
@@ -1130,10 +1089,10 @@ export default function WBSStudio() {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<NodeKey | undefined>();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const initialStorage = useRef<StorageLoadResult | null>(null);
+  const initialStorage = useRef<StorageLoadResult<NodeDef> | null>(null);
 
   if (initialStorage.current === null) {
-    initialStorage.current = loadFromStorage();
+    initialStorage.current = loadFromStorage<NodeDef>(STORAGE_KEY, RECOVERY_KEY, validateTree);
   }
 
   const recoveryRequiredRef = useRef(initialStorage.current.recoveryRequired);
