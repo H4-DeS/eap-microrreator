@@ -132,3 +132,89 @@ describe("Armazenamento da EAP", () => {
     );
   });
 });
+describe("Cenários excepcionais de armazenamento", () => {
+  it("ativa recuperação quando a leitura é bloqueada", () => {
+    vi.spyOn(localStorage, "getItem").mockImplementation(() => {
+      throw new Error("Acesso bloqueado");
+    });
+
+    const result = loadFromStorage(
+      STORAGE_KEY,
+      RECOVERY_KEY,
+      validate
+    );
+
+    expect(result.tree).toBeNull();
+    expect(result.recoveryRequired).toBe(true);
+  });
+
+  it("preserva um backup preexistente", () => {
+    localStorage.setItem(RECOVERY_KEY, "backup-anterior");
+    localStorage.setItem(STORAGE_KEY, "{json-invalido");
+
+    loadFromStorage(STORAGE_KEY, RECOVERY_KEY, validate);
+
+    expect(localStorage.getItem(RECOVERY_KEY)).toBe("backup-anterior");
+  });
+
+  it("utiliza o backup quando a chave principal não existe", () => {
+    localStorage.setItem(RECOVERY_KEY, "dados-recuperados");
+
+    expect(
+      getRecoveryData(STORAGE_KEY, RECOVERY_KEY)
+    ).toBe("dados-recuperados");
+  });
+
+  it("mantém os dados inválidos quando falha a criação do backup", () => {
+    localStorage.setItem(STORAGE_KEY, "{json-invalido");
+
+    vi.spyOn(localStorage, "setItem").mockImplementation(() => {
+      throw new Error("Falha na gravação");
+    });
+
+    const result = loadFromStorage(
+      STORAGE_KEY,
+      RECOVERY_KEY,
+      validate
+    );
+
+    expect(result.recoveryRequired).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe("{json-invalido");
+  });
+
+  it("propaga erros durante a substituição da EAP", () => {
+    vi.spyOn(localStorage, "setItem").mockImplementation(() => {
+      throw new Error("Falha na substituição");
+    });
+
+    expect(() =>
+      replaceStoredTree(STORAGE_KEY, validTree)
+    ).toThrow("Falha na substituição");
+  });
+
+  it("preserva uma EAP com dados associados", () => {
+    const complexTree = {
+      key: "M",
+      label: "Projeto completo",
+      bg: "#ffffff",
+      children: [
+        {
+          key: "1",
+          label: "Pacote de trabalho",
+          docs: ["RT-001", "ET-002"],
+          children: [],
+        },
+      ],
+    };
+
+    saveToStorage(STORAGE_KEY, complexTree);
+
+    const result = loadFromStorage(
+      STORAGE_KEY,
+      RECOVERY_KEY,
+      validate
+    );
+
+    expect(result.tree).toEqual(complexTree);
+  });
+});
