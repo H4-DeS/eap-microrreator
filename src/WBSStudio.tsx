@@ -816,7 +816,7 @@ function makeHeuristicTips(root: NodeDef): string[] {
 async function runOnline(
   prompt: string,
   tree: NodeDef
-): Promise<{ ops?: AIOp[]; tips?: string[]; message?: string }> {
+): Promise<{ ops?: AIOp[]; tips?: string[]; reply?: string }> {
   const url =
     (import.meta as any).env?.VITE_AI_ENDPOINT || "http://localhost:8787/ai/ops";
   const res = await fetch(url, {
@@ -1118,7 +1118,7 @@ export default function WBSStudio() {
     );
     try {
       //const { reply, ops: remoteOps, tips } = await runOnline(prompt, tree);
-      const { message: reply, ops: remoteOps, tips } = await runOnline(prompt, tree);
+      const { reply, ops: remoteOps, tips } = await runOnline(prompt, tree);
       if (reply && reply.trim()) {
         setAiMessages(m => m.concat([{ role: 'assistant', content: reply }]));
       }
