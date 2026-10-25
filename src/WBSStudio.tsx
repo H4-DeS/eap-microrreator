@@ -467,10 +467,10 @@ function summarizeOps(ops: AIOp[]) {
 
 // Comandos aceitos (um por linha):
 // renomear 3.P.1 para Projeto I&C revisado
-// mover 2.K.1 para 2.M
-// adicionar filho em 4.L: Relatório de segurança
-// remover 1.C.1
-// documento 1.P.1 https://minha.url/doc.pdf
+// mover 1.1 para 2
+// adicionar filho em 2: Nova atividade
+// remover 2.1
+// documento 1.1 caminho/do/documento.pdf
 // gerar eap de um centro de tecnologia
 function parseToOps(input: string): AIOp[] {
   const ops: AIOp[] = [];
@@ -494,6 +494,33 @@ function parseToOps(input: string): AIOp[] {
     }
   }
   return ops;
+}
+
+type ParsedCommand =
+  | { kind: "operation"; operation: AIOp }
+  | { kind: "unknown"; text: string };
+
+function parseCommands(input: string): ParsedCommand[] {
+  const lines = input
+    .split(/\n|;+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  return lines.map(line => {
+    const operations = parseToOps(line);
+
+    if (operations.length === 1) {
+      return {
+        kind: "operation" as const,
+        operation: operations[0]
+      };
+    }
+
+    return {
+      kind: "unknown" as const,
+      text: line
+    };
+  });
 }
 
 type OperationResult = {
@@ -886,7 +913,7 @@ function AssistantPanel({
           <div style={{ opacity: 0.85, fontSize: 13 }}>
             Exemplos:
             <br />
-            • <code>renomear 3.P.1 para Projeto I&amp;C revisado</code>
+            • <code>renomear 1.1 para Planejamento revisado</code>
             <br />
             • <code>mover 2.K.1 para 2.M</code>
             <br />
@@ -898,7 +925,7 @@ function AssistantPanel({
             <br />
             • <code>gerar eap de um centro de tecnologia</code>
             <br />
-            • <code>/online reorganize a EAP para foco em licenciamento</code>
+            • <code>/online sugira melhorias na estrutura da EAP</code>
           </div>
         )}
         {messages.map((m, i) => (
@@ -1009,34 +1036,78 @@ export default function WBSStudio() {
     // 0) exibe a pergunta do usuário
     setAiMessages((m) => m.concat([{ role: "user", content: prompt }]));
 
-    // 1) tenta interpretar como comandos locais
-    const ops = parseToOps(prompt);
-    if (ops.length) {
-      const ack = "Vou aplicar:\n" + summarizeOps(ops);
-      setAiMessages((m) => m.concat([{ role: "assistant", content: ack }]));
+    // 1) interpreta comandos locais e preserva a ordem original
+    const commands = parseCommands(prompt);
+    const validOps = commands.flatMap(command =>
+      command.kind === "operation" ? [command.operation] : []
+    );
 
-      const outcome = applyOpsToTree(tree, ops);
-      const newTree = outcome.tree;
+    // Perguntas comuns continuam sendo encaminhadas à IA online.
+    // Uma instrução isolada desconhecida só é tratada localmente
+    // quando começa com um verbo típico de edição.
+    const looksLikeCommand =
+      /^(?:renomear|renomeia|renomeie|mover|adicionar|adicione|apagar|remover|excluir|deletar|documento|gerar\s+eap|duplicar)\b/i.test(prompt);
 
-      if (outcome.changed) commitTree(newTree);
+    const isBatch = /[;\n]/.test(prompt);
+
+    if (validOps.length > 0 || isBatch || looksLikeCommand) {
+      const outcome = applyOpsToTree(tree, validOps);
+
+      if (outcome.changed) {
+        commitTree(outcome.tree);
+      }
+
+      let resultIndex = 0;
+      let executed = 0;
+      let rejected = 0;
+      let unknown = 0;
+
+      const lines = commands.map((command, index) => {
+        if (command.kind === "unknown") {
+          unknown++;
+          return `${index + 1}. ⚠️ Comando não reconhecido: ${command.text}`;
+        }
+
+        const result = outcome.results[resultIndex++];
+
+        if (!result) {
+          rejected++;
+          return `${index + 1}. ❌ Resultado indisponível.`;
+        }
+
+        if (result.success) {
+          executed++;
+        } else {
+          rejected++;
+        }
+
+        return `${index + 1}. ${result.message}`;
+      });
+
+      const report = [
+        "RELATÓRIO DE EXECUÇÃO",
+        "",
+        ...lines,
+        "",
+        `Resumo: ${executed} executada(s), ${rejected} rejeitada(s), ${unknown} não reconhecida(s).`
+      ].join("\n");
 
       setAiMessages(m => m.concat([{
         role: "assistant",
-        content: outcome.results.map(r => r.message).join("\n")
+        content: report
       }]));
-      
 
-      const tips = makeHeuristicTips(newTree);
-      if (tips.length) {
-        setAiMessages((m) =>
-          m.concat([
-            {
-              role: "assistant",
-              content: "Sugestões após alterações:\n- " + tips.join("\n- "),
-            },
-          ])
-        );
+      if (outcome.changed) {
+        const tips = makeHeuristicTips(outcome.tree);
+
+        if (tips.length) {
+          setAiMessages(m => m.concat([{
+            role: "assistant",
+            content: "Sugestões após alterações:\n- " + tips.join("\n- ")
+          }]));
+        }
       }
+
       return;
     }
 
