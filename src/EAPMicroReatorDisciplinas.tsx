@@ -28,7 +28,7 @@ import {
  * ✓ Botão "Resetar" para limpar localStorage e restaurar padrão
  */
 
-const STORAGE_KEY = "eap_mrn_disciplinas_v3";
+const STORAGE_KEY = "wbs_studio_v1";
 
 const COLORS = {
   appBg: "#0B0F19", // fundo escuro da área útil
