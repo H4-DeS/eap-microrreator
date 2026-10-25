@@ -1,3 +1,5 @@
+import { validateTree } from "./validation/validateTree";
+import { generateUniqueChildKey } from "./utils/eapKeys";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import {
   loadFromStorage,
@@ -159,141 +161,13 @@ type NodeDef = {
   docs?: string[];
 };
 
-type ValidationResult = {
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-};
 
-export function validateTree(data: unknown): ValidationResult {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  const seenKeys = new Set<string>();
-
-  const isRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value);
-
-  const visit = (
-    value: unknown,
-    parentKey?: string,
-    location = "raiz"
-  ): void => {
-    if (!isRecord(value)) {
-      errors.push(`${location}: elemento deve ser um objeto.`);
-      return;
-    }
-
-    const key = value.key;
-    const label = value.label;
-
-    if (typeof key !== "string" || !key.trim()) {
-      errors.push(`${location}: identificador ausente ou inválido.`);
-    } else {
-      if (seenKeys.has(key)) {
-        errors.push(`Identificador duplicado: ${key}.`);
-      }
-
-      seenKeys.add(key);
-
-      if (parentKey !== undefined) {
-        const isRootChild = parentKey === "M";
-
-        const suffix = isRootChild
-          ? key
-          : key.startsWith(parentKey + ".")
-            ? key.slice(parentKey.length + 1)
-            : "";
-
-        if (!suffix || suffix.includes(".")) {
-          errors.push(
-            `Hierarquia inconsistente: ${key} não é filho direto de ${parentKey}.`
-          );
-        }
-      }
-    }
-
-    if (typeof label !== "string") {
-      errors.push(`${location}: rótulo ausente ou inválido.`);
-    } else if (!label.trim()) {
-      warnings.push(`${location}: rótulo vazio.`);
-    }
-
-    if (value.docs !== undefined) {
-      if (
-        !Array.isArray(value.docs) ||
-        !value.docs.every(doc => typeof doc === "string")
-      ) {
-        errors.push(`${location}: docs deve ser uma lista de textos.`);
-      }
-    }
-
-    if (value.children !== undefined) {
-      if (!Array.isArray(value.children)) {
-        errors.push(`${location}: children deve ser uma lista.`);
-      } else {
-        value.children.forEach((child, index) => {
-          visit(
-            child,
-            typeof key === "string" ? key : undefined,
-            `${location} > filho ${index + 1}`
-          );
-        });
-      }
-    }
-
-    for (const field of ["bg", "fg"] as const) {
-      const color = value[field];
-
-      if (
-        color !== undefined &&
-        (
-          typeof color !== "string" ||
-          !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)
-        )
-      ) {
-        warnings.push(
-          `${location}: cor inválida no campo ${field}.`
-        );
-      }
-    }
-  };
-
-  visit(data);
-
-  return {
-    valid: errors.length === 0,
-    errors,
-    warnings
-  };
-}
 
 /** Helpers gerais **/
 const waitNextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 const walkTree = (n: NodeDef, fn: (node: NodeDef, parent?: NodeDef) => void, parent?: NodeDef) => { fn(n, parent); n.children?.forEach((c) => walkTree(c, fn, n)); };
 const cloneTree = (n: NodeDef): NodeDef => ({ ...n, children: n.children?.map(cloneTree), docs: n.docs ? [...n.docs] : undefined });
 
-function generateUniqueChildKey(
-  root: NodeDef,
-  parentKey: string
-): string {
-  const existingKeys = new Set<string>();
-
-  walkTree(root, (node) => {
-    existingKeys.add(node.key);
-  });
-
-  let sequence = 1;
-  let candidate = `${parentKey}.${sequence}`;
-
-  while (existingKeys.has(candidate)) {
-    sequence++;
-    candidate = `${parentKey}.${sequence}`;
-  }
-
-  return candidate;
-}
 
 const findPath = (root: NodeDef, key: NodeKey): NodeKey[] | null => {
   const path: NodeKey[] = []; let found = false;
@@ -2432,7 +2306,7 @@ const exportSnapshotPng = async (): Promise<string | null> => {
 		{tree.label}
 		{editMode && (
       		<button 
-			onClick={(e) => { e.stopPropagation(); setSelectedKey("root"); }}
+			onClick={(e) => { e.stopPropagation(); setSelectedKey(tree.key); }}
         		style={{ position: "absolute", right: 8, top: 6, border: "1px solid #94A3B8", background: "#fff", borderRadius: 6, padding: "2px 6px", cursor: "pointer", fontSize: 12 }}
       		>
         		Editar
