@@ -50,3 +50,50 @@ export function loadFromStorage<T>(
 
   return { tree: null, recoveryRequired: true };
 }
+
+
+/**
+ * Salva a EAP no armazenamento local.
+ * Propaga erros para que o chamador decida como tratá-los.
+ */
+export function saveToStorage<T>(
+  storageKey: string,
+  tree: T
+): void {
+  localStorage.setItem(storageKey, JSON.stringify(tree));
+}
+
+/**
+ * Obtém os dados originais para exportação de recuperação.
+ */
+export function getRecoveryData(
+  storageKey: string,
+  recoveryKey: string
+): string | null {
+  const current = localStorage.getItem(storageKey);
+
+  if (current !== null) {
+    return current;
+  }
+
+  return localStorage.getItem(recoveryKey);
+}
+
+/**
+ * Substitui a EAP armazenada por uma estrutura válida.
+ * Não remove a cópia auxiliar de recuperação.
+ */
+export function replaceStoredTree<T>(
+  storageKey: string,
+  tree: T
+): void {
+  saveToStorage(storageKey, tree);
+}
+
+/**
+ * Remove a EAP principal do armazenamento local.
+ * Não remove a cópia auxiliar de recuperação.
+ */
+export function clearStorage(storageKey: string): void {
+  localStorage.removeItem(storageKey);
+}

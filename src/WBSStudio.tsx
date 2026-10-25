@@ -1,5 +1,12 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
-import { loadFromStorage, type StorageLoadResult } from "./storage/eapStorage";
+import {
+  loadFromStorage,
+  saveToStorage,
+  getRecoveryData,
+  replaceStoredTree,
+  clearStorage,
+  type StorageLoadResult
+} from "./storage/eapStorage";
 import { Tree, TreeNode } from "react-organizational-chart";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { toPng } from "html-to-image";
@@ -1317,7 +1324,7 @@ export default function WBSStudio() {
     }
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tree));
+      saveToStorage(STORAGE_KEY, tree);
     } catch (error) {
       console.warn("Falha ao salvar a EAP:", error);
     }
@@ -1458,11 +1465,7 @@ export default function WBSStudio() {
     let raw: string | null = null;
 
     try {
-      raw = localStorage.getItem(STORAGE_KEY);
-
-      if (raw === null) {
-        raw = localStorage.getItem(RECOVERY_KEY);
-      }
+      raw = getRecoveryData(STORAGE_KEY, RECOVERY_KEY);
     } catch (error) {
       console.error("Falha ao acessar dados de recuperação:", error);
       alert("Não foi possível acessar os dados armazenados.");
@@ -1508,7 +1511,7 @@ export default function WBSStudio() {
 
     try {
       // A cópia auxiliar é preservada.
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(blankTree()));
+      replaceStoredTree(STORAGE_KEY, blankTree());
     } catch (error) {
       console.error("Não foi possível concluir o descarte:", error);
       alert("Falha ao atualizar o armazenamento. Os dados não foram descartados.");
@@ -1588,7 +1591,7 @@ export default function WBSStudio() {
       return;
     }
 
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    try { clearStorage(STORAGE_KEY); } catch {}
     setCollapsed({});
     setSelectedKey(undefined);
   
@@ -1611,7 +1614,7 @@ export default function WBSStudio() {
 
   const ok = confirm("Criar uma nova EAP vazia? Isso não apaga arquivos salvos no seu disco, apenas substitui a EAP atual na tela.");
   if (!ok) return;
-  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  try { clearStorage(STORAGE_KEY); } catch {}
   setTree(blankTree());
   setCollapsed({});
   setSelectedKey(undefined);
