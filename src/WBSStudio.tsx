@@ -150,6 +150,116 @@ type NodeDef = {
   docs?: string[];
 };
 
+type ValidationResult = {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+};
+
+export function validateTree(data: unknown): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const seenKeys = new Set<string>();
+
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value);
+
+  const visit = (
+    value: unknown,
+    parentKey?: string,
+    location = "raiz"
+  ): void => {
+    if (!isRecord(value)) {
+      errors.push(`${location}: elemento deve ser um objeto.`);
+      return;
+    }
+
+    const key = value.key;
+    const label = value.label;
+
+    if (typeof key !== "string" || !key.trim()) {
+      errors.push(`${location}: identificador ausente ou inválido.`);
+    } else {
+      if (seenKeys.has(key)) {
+        errors.push(`Identificador duplicado: ${key}.`);
+      }
+
+      seenKeys.add(key);
+
+      if (parentKey !== undefined) {
+        const isRootChild = parentKey === "M";
+
+        const suffix = isRootChild
+          ? key
+          : key.startsWith(parentKey + ".")
+            ? key.slice(parentKey.length + 1)
+            : "";
+
+        if (!suffix || suffix.includes(".")) {
+          errors.push(
+            `Hierarquia inconsistente: ${key} não é filho direto de ${parentKey}.`
+          );
+        }
+      }
+    }
+
+    if (typeof label !== "string") {
+      errors.push(`${location}: rótulo ausente ou inválido.`);
+    } else if (!label.trim()) {
+      warnings.push(`${location}: rótulo vazio.`);
+    }
+
+    if (value.docs !== undefined) {
+      if (
+        !Array.isArray(value.docs) ||
+        !value.docs.every(doc => typeof doc === "string")
+      ) {
+        errors.push(`${location}: docs deve ser uma lista de textos.`);
+      }
+    }
+
+    if (value.children !== undefined) {
+      if (!Array.isArray(value.children)) {
+        errors.push(`${location}: children deve ser uma lista.`);
+      } else {
+        value.children.forEach((child, index) => {
+          visit(
+            child,
+            typeof key === "string" ? key : undefined,
+            `${location} > filho ${index + 1}`
+          );
+        });
+      }
+    }
+
+    for (const field of ["bg", "fg"] as const) {
+      const color = value[field];
+
+      if (
+        color !== undefined &&
+        (
+          typeof color !== "string" ||
+          !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)
+        )
+      ) {
+        warnings.push(
+          `${location}: cor inválida no campo ${field}.`
+        );
+      }
+    }
+  };
+
+  visit(data);
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
 /** Helpers gerais **/
 const waitNextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 const walkTree = (n: NodeDef, fn: (node: NodeDef, parent?: NodeDef) => void, parent?: NodeDef) => { fn(n, parent); n.children?.forEach((c) => walkTree(c, fn, n)); };
@@ -1321,7 +1431,55 @@ export default function WBSStudio() {
   /** Salvar / Carregar JSON **/
   const saveJson = () => { const blob = new Blob([JSON.stringify(tree, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `WBS_Studio_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); };
   const triggerLoadJson = () => { fileInputRef.current?.click(); };
-  const onLoadJsonFile = (ev: React.ChangeEvent<HTMLInputElement>) => { const file = ev.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const obj = JSON.parse(String(reader.result)); setTree(obj); setCollapsed({}); } catch { alert("JSON inválido"); } }; reader.readAsText(file); ev.target.value = ""; };
+  const onLoadJsonFile = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      let data: unknown;
+
+      try {
+        data = JSON.parse(String(reader.result));
+      } catch {
+        alert("O arquivo selecionado não contém um JSON válido.");
+        return;
+      }
+
+      const validation = validateTree(data);
+
+      if (!validation.valid) {
+        alert(
+          "IMPORTAÇÃO BLOQUEADA\\n\\n" +
+          "Foram encontrados problemas estruturais:\\n\\n" +
+          validation.errors.join("\\n")
+        );
+        return;
+      }
+
+      if (validation.warnings.length > 0) {
+        const proceed = confirm(
+          "AVISOS NA IMPORTAÇÃO\\n\\n" +
+          validation.warnings.join("\\n") +
+          "\\n\\nDeseja importar mesmo assim?"
+        );
+
+        if (!proceed) return;
+      }
+
+      commitTree(data as NodeDef);
+      setCollapsed({});
+      setSelectedKey(undefined);
+    };
+
+    reader.onerror = () => {
+      alert("Não foi possível ler o arquivo selecionado.");
+    };
+
+    reader.readAsText(file);
+    ev.target.value = "";
+  };
   //const resetStorage = () => { try { localStorage.removeItem(STORAGE_KEY); setTree(initialTree()); setCollapsed({}); setSelectedKey(undefined); } catch {} };
   const resetStorage = async () => {
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
