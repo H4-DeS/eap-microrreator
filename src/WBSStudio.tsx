@@ -1297,7 +1297,9 @@ export default function WBSStudio() {
 
     if (stored) {
       // veio do storage → colapsa uma vez
-      requestAnimationFrame(() => collapseAll());
+      requestAnimationFrame(() => {
+        setCollapsed(collapsedStateForTree(stored));
+      });
       return;
     }
   
@@ -1309,7 +1311,9 @@ export default function WBSStudio() {
         if (!alive) return;
         setTree(def);
         setStorageReady(true);
-        requestAnimationFrame(() => collapseAll());
+        requestAnimationFrame(() => {
+          setCollapsed(collapsedStateForTree(def));
+        });
         setSelectedKey(undefined);
       } catch (e) {
         if (!alive) return;
@@ -1635,7 +1639,23 @@ export default function WBSStudio() {
   /** Expand/Collapse **/
   const toggle = (key: NodeKey) => setCollapsed((s) => ({ ...s, [key]: !(s[key] ?? false) }));
   const expandAll = () => { const all: Record<NodeKey, boolean> = {}; const w = (n: NodeDef) => { all[n.key] = false; n.children?.forEach(w); }; w(tree); setCollapsed(all); };
-  const collapseAll = () => { const all: Record<NodeKey, boolean> = {}; const w = (n: NodeDef) => { all[n.key] = true; n.children?.forEach(w); }; w(tree); all[tree.key] = false; setCollapsed(all); };
+  const collapsedStateForTree = (root: NodeDef): Record<NodeKey, boolean> => {
+    const all: Record<NodeKey, boolean> = {};
+
+    const visit = (node: NodeDef) => {
+      all[node.key] = true;
+      node.children?.forEach(visit);
+    };
+
+    visit(root);
+    all[root.key] = false;
+
+    return all;
+  };
+
+  const collapseAll = () => {
+    setCollapsed(collapsedStateForTree(tree));
+  };
 
 // Gera um PNG da EAP em "visão geral" (layout fixo, sem filtro, tudo expandido)
 // sem alterar permanentemente o estado que o usuário está vendo.
