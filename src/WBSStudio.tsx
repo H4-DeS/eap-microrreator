@@ -155,6 +155,27 @@ const waitNextFrame = () => new Promise<void>((r) => requestAnimationFrame(() =>
 const walkTree = (n: NodeDef, fn: (node: NodeDef, parent?: NodeDef) => void, parent?: NodeDef) => { fn(n, parent); n.children?.forEach((c) => walkTree(c, fn, n)); };
 const cloneTree = (n: NodeDef): NodeDef => ({ ...n, children: n.children?.map(cloneTree), docs: n.docs ? [...n.docs] : undefined });
 
+function generateUniqueChildKey(
+  root: NodeDef,
+  parentKey: string
+): string {
+  const existingKeys = new Set<string>();
+
+  walkTree(root, (node) => {
+    existingKeys.add(node.key);
+  });
+
+  let sequence = 1;
+  let candidate = `${parentKey}.${sequence}`;
+
+  while (existingKeys.has(candidate)) {
+    sequence++;
+    candidate = `${parentKey}.${sequence}`;
+  }
+
+  return candidate;
+}
+
 const findPath = (root: NodeDef, key: NodeKey): NodeKey[] | null => {
   const path: NodeKey[] = []; let found = false;
   const dfs = (node: NodeDef, acc: NodeKey[]) => { if (found) return; const next = [...acc, node.key]; if (node.key === key) { path.push(...next); found = true; return; } node.children?.forEach((c) => dfs(c, next)); };
@@ -481,12 +502,11 @@ function applyOpsToTree(root: NodeDef, ops: AIOp[]): NodeDef {
   const doAdd = (parentKey: string, label: string) => {
     const path = findPath(t, parentKey); if (!path) return;
     const { node } = getByPath(t, path); node.children = node.children ?? [];
-    const seq = (node.children?.length ?? 0) + 1;
-    const newKey = parentKey === 'root' ? String(seq) : (parentKey + '.' + seq);
+    const newKey = generateUniqueChildKey(t, parentKey);
     node.children.push({ key: newKey, label: label, docs: [] });
   };
   const doRemove = (key: string) => {
-    if (key === 'root') return; const path = findPath(t, key); if (!path) return;
+    if (key === t.key) return; const path = findPath(t, key); if (!path) return;
     const parentPath = path.slice(0, -1);
     const { node: parent } = getByPath(t, parentPath);
     if (!parent.children) return;
@@ -494,16 +514,97 @@ function applyOpsToTree(root: NodeDef, ops: AIOp[]): NodeDef {
   };
   const doRename = (key: string, label: string) => { walkTree(t, (n) => { if (n.key === key) n.label = label; }); };
   const doMove = (key: string, newParent: string) => {
-    if (key === 'root') return;
-    const srcPath = findPath(t, key); const dstPath = findPath(t, newParent);
+    if (key === t.key) return;
+
+    const srcPath = findPath(t, key);
+    const dstPath = findPath(t, newParent);
+
     if (!srcPath || !dstPath) return;
+
+    // Impede movimentações circulares.
+    const destinationIsDescendant =
+      dstPath.length >= srcPath.length &&
+      srcPath.every((part, index) => part === dstPath[index]);
+
+    if (destinationIsDescendant) return;
+
     const parentPath = srcPath.slice(0, -1);
     const parent = getByPath(t, parentPath).node;
-    const idx = parent.children?.findIndex(c => c.key === key) ?? -1;
-    if (!parent.children || idx < 0) return;
-    const [item] = parent.children.splice(idx, 1);
-    const dst = getByPath(t, dstPath).node; dst.children = dst.children ?? []; dst.children.push(item);
+    const destination = getByPath(t, dstPath).node;
+
+    if (!parent.children) return;
+
+    const index = parent.children.findIndex(
+      (child) => child.key === key
+    );
+
+    if (index < 0) return;
+
+    // Não realiza movimentação para o mesmo pai.
+    if (parent.key === destination.key) return;
+
+    // Calcula o identificador antes de modificar a árvore.
+    const newKey = generateUniqueChildKey(t, newParent);
+
+    // Identifica possíveis colisões envolvendo descendentes.
+    const movingKeys = new Set<string>();
+    walkTree(parent.children[index], (node) => {
+      movingKeys.add(node.key);
+    });
+
+    const existingKeys = new Set<string>();
+    walkTree(t, (node) => {
+      if (!movingKeys.has(node.key)) existingKeys.add(node.key);
+    });
+
+    const proposedKeys = new Set<string>();
+    let valid = true;
+
+    walkTree(parent.children[index], (node) => {
+      const suffix = node.key.slice(key.length);
+      const candidate = newKey + suffix;
+
+      if (
+        !node.key.startsWith(key + ".") &&
+        node.key !== key
+      ) {
+        valid = false;
+      }
+
+      if (existingKeys.has(candidate) || proposedKeys.has(candidate)) {
+        valid = false;
+      }
+
+      proposedKeys.add(candidate);
+    });
+
+    if (!valid) return;
+
+    // Remove o elemento da posição original.
+    const [item] = parent.children.splice(index, 1);
+
+    // Atualiza os identificadores da subárvore.
+    walkTree(item, (node) => {
+      const oldKey = node.key;
+      const suffix = oldKey.slice(key.length);
+      const updatedKey = newKey + suffix;
+
+      // Atualiza o prefixo do rótulo, quando corresponde à chave antiga.
+      if (
+        node.label === oldKey ||
+        node.label.startsWith(oldKey + " ")
+      ) {
+        node.label = updatedKey + node.label.slice(oldKey.length);
+      }
+
+      node.key = updatedKey;
+    });
+
+    // Insere no novo pai.
+    destination.children = destination.children ?? [];
+    destination.children.push(item);
   };
+
   const doAddDoc = (key: string, doc: string) => { walkTree(t, (n) => { if (n.key === key) { n.docs = n.docs ?? []; n.docs.push(doc); } }); };
   const doGenerate = (description?: string) => {
     const title = description ? ('PROJETO: ' + description) : 'PROJETO: Novo Projeto';
@@ -957,14 +1058,13 @@ export default function WBSStudio() {
     if (!path) return;
     const { node } = getByPath(next, path);
     node.children = node.children ?? [];
-    const seq = (node.children?.length ?? 0) + 1;
-    const newKey = `${parentKey}.${seq}` as NodeKey;
+    const newKey = generateUniqueChildKey(next, parentKey);
     node.children.push({ key: newKey, label: `${newKey} Novo item`, docs: [] });
     commitTree(next);
   };
   
   const removeNode = (key: NodeKey) => {
-    if (key === "root") return;
+    if (key === tree.key) return;
     const next = cloneTree(tree);
     const path = findPath(next, key);
     if (!path) return;
@@ -976,7 +1076,7 @@ export default function WBSStudio() {
   };
   
   const moveNode = (key: NodeKey, dir: -1 | 1) => {
-    if (key === "root") return;
+    if (key === tree.key) return;
     const next = cloneTree(tree);
     const path = findPath(next, key);
     if (!path) return;
