@@ -1110,6 +1110,11 @@ export default function WBSStudio() {
   const [tree, setTree] = useState<NodeDef>(
     () => initialStorage.current?.tree ?? blankTree()
   );
+
+  // Impede a persistência antes da conclusão da inicialização.
+  const [storageReady, setStorageReady] = useState<boolean>(
+    () => Boolean(initialStorage.current?.tree)
+  );
   const [aiOpen, setAiOpen] = useState<boolean>(false);
   const [aiMessages, setAiMessages] = useState<ChatMsg[]>([]);
   const [aiMode, setAiMode] = useState<'offline' | 'online'>('offline');
@@ -1303,11 +1308,15 @@ export default function WBSStudio() {
         const def = await loadDefaultTree();
         if (!alive) return;
         setTree(def);
+        setStorageReady(true);
         requestAnimationFrame(() => collapseAll());
         setSelectedKey(undefined);
       } catch (e) {
-        // fallback: mantém blankTree()
+        if (!alive) return;
+
+        // Fallback: mantém blankTree() e conclui a inicialização.
         console.warn("Falha ao carregar default.eap.json:", e);
+        setStorageReady(true);
       }
     })();
   
@@ -1316,6 +1325,8 @@ export default function WBSStudio() {
   
   /**persistência no localStorage */
   useEffect(() => {
+    if (!storageReady) return;
+
     if (recoveryRequiredRef.current) {
       console.warn(
         "Persistência suspensa: existem dados inválidos aguardando recuperação."
@@ -1328,7 +1339,7 @@ export default function WBSStudio() {
     } catch (error) {
       console.warn("Falha ao salvar a EAP:", error);
     }
-  }, [tree]);
+  }, [tree, storageReady]);
 
 
   /** Persistência automática */
