@@ -29,6 +29,12 @@ import {
  */
 
 const STORAGE_KEY = "wbs_studio_v1";
+const RECOVERY_KEY = "wbs_studio_recovery_v1";
+
+type StorageLoadResult = {
+  tree: NodeDef | null;
+  recoveryRequired: boolean;
+};
 
 const COLORS = {
   appBg: "#0B0F19", // fundo escuro da área útil
@@ -299,16 +305,43 @@ const getByPath = (root: NodeDef, path: NodeKey[]): { node: NodeDef; parent?: No
   return { node: cur, parent, index: idx };
 };
 
-function loadFromStorage(): NodeDef | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
+function loadFromStorage(): StorageLoadResult {
+  let raw: string | null;
 
+  try {
+    raw = localStorage.getItem(STORAGE_KEY);
+  } catch (error) {
+    console.warn("Não foi possível acessar o armazenamento local:", error);
+    return { tree: null, recoveryRequired: true };
+  }
+
+  if (raw === null) {
+    return { tree: null, recoveryRequired: false };
+  }
+
+  try {
+    const data: unknown = JSON.parse(raw);
+    const validation = validateTree(data);
+
+    if (validation.valid) {
+      return { tree: data as NodeDef, recoveryRequired: false };
+    }
+
+    console.error("EAP armazenada inválida:", validation.errors);
+  } catch (error) {
+    console.error("JSON armazenado inválido:", error);
+  }
+
+  try {
+    if (localStorage.getItem(RECOVERY_KEY) === null) {
+      localStorage.setItem(RECOVERY_KEY, raw);
+    }
+  } catch (error) {
+    console.warn("Falha ao criar cópia de recuperação:", error);
+  }
+
+  return { tree: null, recoveryRequired: true };
+}
 async function loadDefaultTree(): Promise<NodeDef> {
   // public/default.eap.json
   const res = await fetch("/default.eap.json", { cache: "no-store" });
@@ -1097,7 +1130,20 @@ export default function WBSStudio() {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<NodeKey | undefined>();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const [tree, setTree] = useState<NodeDef>(() => loadFromStorage() ?? blankTree());
+  const initialStorage = useRef<StorageLoadResult | null>(null);
+
+  if (initialStorage.current === null) {
+    initialStorage.current = loadFromStorage();
+  }
+
+  const recoveryRequiredRef = useRef(initialStorage.current.recoveryRequired);
+  const [recoveryRequired, setRecoveryRequired] = useState(
+    initialStorage.current.recoveryRequired
+  );
+
+  const [tree, setTree] = useState<NodeDef>(
+    () => initialStorage.current?.tree ?? blankTree()
+  );
   const [aiOpen, setAiOpen] = useState<boolean>(false);
   const [aiMessages, setAiMessages] = useState<ChatMsg[]>([]);
   const [aiMode, setAiMode] = useState<'offline' | 'online'>('offline');
@@ -1269,7 +1315,15 @@ export default function WBSStudio() {
    // se já tem uma árvore salva, não sobrescreve
   useEffect(() => {
     
-    const stored = loadFromStorage();
+    const stored = initialStorage.current?.tree;
+
+    if (recoveryRequiredRef.current) {
+      console.warn(
+        "EAP inválida detectada. Dados preservados para recuperação."
+      );
+      return;
+    }
+
     if (stored) {
       // veio do storage → colapsa uma vez
       requestAnimationFrame(() => collapseAll());
@@ -1296,15 +1350,27 @@ export default function WBSStudio() {
   
   /**persistência no localStorage */
   useEffect(() => {
+    if (recoveryRequiredRef.current) {
+      console.warn(
+        "Persistência suspensa: existem dados inválidos aguardando recuperação."
+      );
+      return;
+    }
+
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tree));
-    } catch {}
+    } catch (error) {
+      console.warn("Falha ao salvar a EAP:", error);
+    }
   }, [tree]);
 
 
   /** Persistência automática */
   useEffect(() => {
   const onKey = (e: KeyboardEvent) => {
+    // Bloqueia os atalhos do editor durante a recuperação de dados.
+    if (recoveryRequiredRef.current) return;
+
     // Evita atalhos globais enquanto digita em campos de texto ou no painel de edição
     const ae = (document.activeElement as HTMLElement) || (e.target as HTMLElement | null);
     const typing = !!ae && (ae.isContentEditable || ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || (typeof ae.closest === 'function' && !!ae.closest('[data-edit-panel="true"]')));
@@ -1428,6 +1494,78 @@ export default function WBSStudio() {
   };
   
 
+  /** Exportação de emergência dos dados armazenados */
+  const exportRecoveryData = () => {
+    let raw: string | null = null;
+
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+
+      if (raw === null) {
+        raw = localStorage.getItem(RECOVERY_KEY);
+      }
+    } catch (error) {
+      console.error("Falha ao acessar dados de recuperação:", error);
+      alert("Não foi possível acessar os dados armazenados.");
+      return;
+    }
+
+    if (raw === null) {
+      alert("Nenhum dado de recuperação foi encontrado.");
+      return;
+    }
+
+    const blob = new Blob([raw], {
+      type: "application/json;charset=utf-8"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `WBS_Studio_Recuperacao_${new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")}.json`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  /** Encerramento explícito da recuperação */
+  const discardRecoveryData = () => {
+    if (!recoveryRequiredRef.current) return;
+
+    const confirmed = confirm(
+      "ATENÇÃO: DESCARTE DE DADOS\\n\\n" +
+      "Esta operação substituirá a EAP inválida armazenada por uma nova EAP vazia.\\n\\n" +
+      "Recomendamos exportar os dados de recuperação antes de continuar.\\n\\n" +
+      "Deseja realmente descartar os dados inválidos?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      // A cópia auxiliar é preservada.
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(blankTree()));
+    } catch (error) {
+      console.error("Não foi possível concluir o descarte:", error);
+      alert("Falha ao atualizar o armazenamento. Os dados não foram descartados.");
+      return;
+    }
+
+    recoveryRequiredRef.current = false;
+    setRecoveryRequired(false);
+    setTree(blankTree());
+    setPast([]);
+    setFuture([]);
+    setCollapsed({});
+    setSelectedKey(undefined);
+    setFilterTopLevelKey(null);
+  };
+
   /** Salvar / Carregar JSON **/
   const saveJson = () => { const blob = new Blob([JSON.stringify(tree, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `WBS_Studio_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); };
   const triggerLoadJson = () => { fileInputRef.current?.click(); };
@@ -1482,6 +1620,15 @@ export default function WBSStudio() {
   };
   //const resetStorage = () => { try { localStorage.removeItem(STORAGE_KEY); setTree(initialTree()); setCollapsed({}); setSelectedKey(undefined); } catch {} };
   const resetStorage = async () => {
+    if (recoveryRequiredRef.current) {
+      alert(
+        "RECUPERAÇÃO PENDENTE\n\n" +
+        "Existem dados inválidos preservados no armazenamento local. " +
+        "A operação Resetar está temporariamente bloqueada para evitar perda de informações."
+      );
+      return;
+    }
+
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
     setCollapsed({});
     setSelectedKey(undefined);
@@ -1494,6 +1641,15 @@ export default function WBSStudio() {
     }
   };
   const newEap = () => {
+  if (recoveryRequiredRef.current) {
+    alert(
+      "RECUPERAÇÃO PENDENTE\n\n" +
+      "Existem dados inválidos preservados no armazenamento local. " +
+      "Exporte os dados de recuperação antes de iniciar uma nova EAP."
+    );
+    return;
+  }
+
   const ok = confirm("Criar uma nova EAP vazia? Isso não apaga arquivos salvos no seu disco, apenas substitui a EAP atual na tela.");
   if (!ok) return;
   try { localStorage.removeItem(STORAGE_KEY); } catch {}
@@ -2003,6 +2159,110 @@ const exportSnapshotPng = async (): Promise<string | null> => {
   const topChildren = useMemo(() => (filterTopLevelKey ? tree.children?.filter((c) => c.key === filterTopLevelKey) ?? [] : (tree.children ?? [])), [tree, filterTopLevelKey]);
   const selectedNodePath = selectedKey ? findPath(tree, selectedKey) : null; const selectedNode = selectedNodePath ? getByPath(tree, selectedNodePath).node : undefined;
 
+  if (recoveryRequired) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 24,
+          boxSizing: "border-box",
+          background: "#0F172A",
+          overflowY: "auto",
+          zIndex: 9999
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 620,
+            padding: 32,
+            borderRadius: 16,
+            background: "#F8FAFC",
+            color: "#0F172A",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.35)"
+          }}
+        >
+          <h1 style={{ marginTop: 0, fontSize: 26 }}>
+            Recuperação de dados
+          </h1>
+
+          <p style={{ lineHeight: 1.6 }}>
+            O WBS Studio identificou um problema nos dados armazenados
+            neste navegador.
+          </p>
+
+          <p style={{ lineHeight: 1.6 }}>
+            Para evitar perda de informações, o salvamento automático
+            foi suspenso e o editor está temporariamente indisponível.
+          </p>
+
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 8,
+              background: "#FEF3C7",
+              border: "1px solid #F59E0B",
+              marginBottom: 24
+            }}
+          >
+            <strong>Recomendação:</strong> exporte os dados originais
+            antes de descartá-los. O arquivo poderá ser utilizado
+            posteriormente para uma tentativa de recuperação.
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 12
+            }}
+          >
+            <button
+              style={{
+                ...btn,
+                background: "#DBEAFE",
+                borderColor: "#2563EB",
+                color: "#1E3A8A"
+              }}
+              onClick={exportRecoveryData}
+            >
+              Exportar dados para recuperação
+            </button>
+
+            <button
+              style={{
+                ...btn,
+                background: "#FEE2E2",
+                borderColor: "#DC2626",
+                color: "#7F1D1D"
+              }}
+              onClick={discardRecoveryData}
+            >
+              Descartar dados inválidos e iniciar nova EAP
+            </button>
+          </div>
+
+          <p
+            style={{
+              fontSize: 12,
+              color: "#64748B",
+              marginTop: 24,
+              marginBottom: 0
+            }}
+          >
+            WBS Studio — Proteção do armazenamento local
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={wrap}>
       {/* Topbar apenas com o ícone */}
@@ -2047,6 +2307,32 @@ const exportSnapshotPng = async (): Promise<string | null> => {
       <div style={sidebarGroup}>
          <button style={{ ...btn, background: "#DCFCE7", borderColor: "#16A34A" }} onClick={newEap}>Novo</button>
 	<button style={btn} onClick={saveJson}>Salvar JSON (Ctrl+S)</button>
+	{recoveryRequired && (
+	  <button
+	    style={{
+	      ...btn,
+	      background: "#FEF3C7",
+	      borderColor: "#D97706",
+	      color: "#78350F"
+	    }}
+	    onClick={exportRecoveryData}
+	  >
+	    Exportar dados para recuperação
+	  </button>
+	)}
+        {recoveryRequired && (
+          <button
+            style={{
+              ...btn,
+              background: "#FEE2E2",
+              borderColor: "#DC2626",
+              color: "#7F1D1D"
+            }}
+            onClick={discardRecoveryData}
+          >
+            Descartar dados inválidos e iniciar nova EAP
+          </button>
+        )}
         <button style={btn} onClick={triggerLoadJson}>Carregar JSON (Ctrl+O)</button>
         <button style={btn} onClick={undo} disabled={past.length === 0}>Desfazer (Ctrl+Z)</button>
         <button style={btn} onClick={redo} disabled={future.length === 0}>Refazer (Ctrl+Y)</button>
