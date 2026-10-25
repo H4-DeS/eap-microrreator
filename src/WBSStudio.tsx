@@ -34,9 +34,6 @@ const COLORS = {
   appBg: "#0B0F19", // fundo escuro da área útil
   rootBg: "#1E3A8A",
   rootFg: "#FFFFFF",
-  ucBg: "#C7D2FE",
-  udt2Bg: "#BBF7D0",
-  udt3Bg: "#FEF9C3",
   spcBg: "#FCA5A5",
   mrBg: "#DDD6FE",
   matBg: "#FED7AA",
@@ -170,19 +167,6 @@ const getByPath = (root: NodeDef, path: NodeKey[]): { node: NodeDef; parent?: No
   for (let i = 1; i < path.length; i++) { parent = cur; const k = path[i]; idx = cur.children?.findIndex((c) => c.key === k); if (idx == null || idx < 0 || !cur.children) break; cur = cur.children[idx]; }
   return { node: cur, parent, index: idx };
 };
-
-//Define a árvore inicial a ser gerada ao clicar no botão
-/**const initialTree = (): NodeDef => {
-  return {
-    key: "M",
-    label: "PROJETO: Microrreator Nuclear",
-    bg: COLORS.rootBg,
-    fg: COLORS.rootFg,
-    children: [
-      // ... seu conteúdo
-    ],
-  };
-};**/
 
 function loadFromStorage(): NodeDef | null {
   try {
@@ -902,45 +886,6 @@ export default function WBSStudio() {
 }, [selectedKey, tree]);
 
 // function loadFromStorage(): NodeDef | null { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; return JSON.parse(raw); } catch { return null; } }
-/** 
-  function initialTree(): NodeDef {
-    const t: NodeDef = {
-      key: "root",
-      label: "PROJETO: Microrreator Nuclear",
-      bg: COLORS.rootBg, fg: COLORS.rootFg,
-      children: [
-        { key: "1", label: "1 Unidade Crítica (UCRI) — (UDT-1)", bg: COLORS.ucBg, children: disciplinas("1", [
-          { key: "1.Azul.1", label: "1.A.1 Aquisições da UCri (equipamentos, instrumentos, serviços)", docs: [] },
-          { key: "1.Preto.1", label: "1.P.1 Projetos: neutrônico, mecânico, vareta combustível, I&C", docs: [] },
-          { key: "1.P.2", label: "1.P.2 Planejamento e especificação das rotinas experimentais da UCri", docs: [] },
-          { key: "1.C2.1", label: "1.C.1 Adequações físicas mínimas / infraestrutura de apoio à UCri (se aplicável)", docs: [] },
-          { key: "1.L.1", label: "1.L.1 Submissão e aprovação das rotinas experimentais junto à Autoridade Nuclear (AN)", docs: [] },
-          { key: "1.M.1", label: "1.M.1 Montagem/instalação de instrumentos e arranjos de ensaio da UCri", docs: [] },
-          { key: "1.K.1", label: "1.K.1 Execução das rotinas experimentais e registros de comissionamento da UCri", docs: [] },
-        ])},
-        { key: "2", label: "2 Bancadas Experimentais da UDT-2 (Efeito Separado) — (UDT-2)", bg: COLORS.udt2Bg, children: disciplinas("2", [
-          { key: "2.A.1", label: "2.A.1 Aquisição de equipamentos, instrumentos, componentes e materiais (UDT-2)", docs: [] },
-          { key: "2.P.1", label: "2.P.1 Projetos: mecânico, I&C, proteção das bancadas de efeito separado", docs: [] },
-          { key: "2.P.2", label: "2.P.2 Preparação/planejamento de rotinas experimentais (UDT-2)", docs: [] },
-          { key: "2.C.1", label: "2.C.1 Construção das bancadas de efeito separado (UDT-2)", docs: [] },
-          { key: "2.L.1", label: "2.L.1 Submissão e aprovação das rotinas junto à AN (UDT-2)", docs: [] },
-          { key: "2.M.1", label: "2.M.1 Montagem e integração dos sistemas das bancadas (UDT-2)", docs: [] },
-          { key: "2.K.1", label: "2.K.1 Comissionamento e execução dos experimentos de efeito separado (UDT-2)", docs: [] },
-        ])},
-        { key: "3", label: "3 Bancadas Experimentais da UDT-3 (Efeito Integrado) — (UDT-3)", bg: COLORS.udt3Bg, children: disciplinas("3", [
-          { key: "3.A.1", label: "3.A.1 Aquisição de equipamentos/instrumentos para efeito integrado (UDT-3) e itens conjuntos UDT-2/UDT-3", docs: [] },
-          { key: "3.P.1", label: "3.P.1 Projetos da bancada de transferência de calor (efeito integrado): mecânico, I&C, proteção", docs: [] },
-          { key: "3.P.2", label: "3.P.2 Planejamento/roteiros experimentais (UDT-3)", docs: [] },
-          { key: "3.C.1", label: "3.C.1 Construção das bancadas de efeito integrado (UDT-3)", docs: [] },
-          { key: "3.L.1", label: "3.L.1 Submissão e aprovação das rotinas junto à AN (UDT-3)", docs: [] },
-          { key: "3.M.1", label: "3.M.1 Montagem e integração dos sistemas das bancadas (UDT-3)", docs: [] },
-          { key: "3.K.1", label: "3.K.1 Comissionamento e execução dos experimentos de efeito integrado (UDT-3)", docs: [] },
-        ])},
-      ],
-    };
-    return t;
-  }
-  */
   function blankTree(): NodeDef {
     return {
       key: "M",
